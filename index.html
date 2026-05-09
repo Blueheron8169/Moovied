@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CineClub - Live Chat & OMDB Movies</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-layout">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <div class="logo">🎬 CineClub</div>
+            <ul class="nav-menu">
+                <li class="nav-item active" data-tab="movies-view">
+                    <span class="icon">🍿</span> Movies & Search
+                </li>
+                <li class="nav-item" data-tab="lists-view">
+                    <span class="icon">📚</span> My Lists
+                </li>
+                <li class="nav-item" data-tab="clubs-view">
+                    <span class="icon">🎟️</span> My Clubs
+                </li>
+                <li class="nav-item" data-tab="global-chat-view">
+                    <span class="icon">💬</span> Global Live Chat
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            
+            <!-- Movies View -->
+            <section id="movies-view" class="tab-view active">
+                <div class="header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                    <div>
+                        <h1>Discover Movies</h1>
+                        <p>Powered by OMDB API.</p>
+                    </div>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <input type="text" id="movie-search" placeholder="Search a movie..." class="input-glow">
+                        <button id="search-btn" class="btn btn-primary">Search</button>
+                    </div>
+                </div>
+                
+                <div id="search-results-container" style="display:none; margin-bottom: 3rem;">
+                    <h2 class="section-title">Search Results</h2>
+                    <div class="grid-layout" id="search-grid"></div>
+                </div>
+
+                <div class="recently-reviewed-section" style="margin-bottom: 3rem;">
+                    <h2 class="section-title">Community Recently Reviewed</h2>
+                    <div class="horizontal-scroll" id="recent-reviews-row">
+                        <p style="color:var(--text-muted)">Loading recent reviews...</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- My Lists View -->
+            <section id="lists-view" class="tab-view">
+                <div class="header">
+                    <h1>My Personal Lists</h1>
+                    <p>Track your cinematic journey.</p>
+                </div>
+                
+                <div style="margin-bottom: 3rem;">
+                    <h2 class="section-title" style="color: #ff4757;">❤️ Favorites</h2>
+                    <div class="grid-layout" id="favorites-grid"></div>
+                </div>
+
+                <div style="margin-bottom: 3rem;">
+                    <h2 class="section-title" style="color: #2ed573;">✅ Already Watched</h2>
+                    <div class="grid-layout" id="watched-grid"></div>
+                </div>
+
+                <div style="margin-bottom: 3rem;">
+                    <h2 class="section-title" style="color: #1e90ff;">📋 Watchlist</h2>
+                    <div class="grid-layout" id="watchlist-grid"></div>
+                </div>
+            </section>
+
+            <!-- My Clubs View -->
+            <section id="clubs-view" class="tab-view">
+                <div class="header">
+                    <h1>Movie Clubs</h1>
+                    <p>Create or join private clubs to chat with your friends.</p>
+                </div>
+
+                <div style="display: flex; gap: 2rem; margin-bottom: 2rem;">
+                    <div class="glass-panel" style="padding: 1.5rem; flex: 1;">
+                        <h3>Create a Club</h3>
+                        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem;">Start a new private club and invite friends.</p>
+                        <input type="text" id="club-name-input" class="input-glow" placeholder="Club Name (e.g., Horror Fanatics)" style="width: 100%; margin-bottom: 1rem;">
+                        <button id="create-club-btn" class="btn btn-primary" style="width: 100%;">Create Club</button>
+                    </div>
+                    <div class="glass-panel" style="padding: 1.5rem; flex: 1;">
+                        <h3>Join a Club</h3>
+                        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem;">Have an invite code? Enter it below.</p>
+                        <input type="text" id="club-invite-input" class="input-glow" placeholder="Enter 5-digit Invite Code" style="width: 100%; margin-bottom: 1rem;">
+                        <button id="join-club-btn" class="btn btn-outline" style="width: 100%;">Join Club</button>
+                    </div>
+                </div>
+
+                <div id="my-clubs-list" style="margin-bottom: 2rem;">
+                    <h2 class="section-title">My Active Clubs</h2>
+                    <div class="horizontal-scroll" id="clubs-row">
+                        <p style="color:var(--text-muted)">You haven't joined any clubs yet.</p>
+                    </div>
+                </div>
+
+                <!-- Active Club Chat Box (Hidden until a club is selected) -->
+                <div id="club-chat-section" style="display: none;">
+                    <h2 class="section-title" id="active-club-name" style="color: #ff4757;">Club Chat</h2>
+                    <div class="chat-container glass-panel" style="height: 400px; max-width: 100%;">
+                        <div class="chat-messages" id="club-chat-messages"></div>
+                        <div class="chat-input-area">
+                            <input type="text" id="club-chat-input" placeholder="Message club members..." autocomplete="off">
+                            <button id="send-club-chat-btn" class="btn btn-primary">Send</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Global Chat View -->
+            <section id="global-chat-view" class="tab-view">
+                <div class="header">
+                    <h1>Global Live Chat</h1>
+                    <p>Chat with everyone. <span style="color:var(--primary-red);">Explicit content is strictly filtered.</span></p>
+                </div>
+                
+                <div class="chat-container glass-panel">
+                    <div class="chat-messages" id="global-chat-messages">
+                        <p style="color:var(--text-muted); text-align:center;">Connecting to Global Chat...</p>
+                    </div>
+                    
+                    <div class="chat-input-area">
+                        <input type="text" id="global-chat-input" placeholder="Type a message..." autocomplete="off">
+                        <button id="send-global-chat-btn" class="btn btn-primary">Send</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Movie Details Modal -->
+    <div id="movie-modal" class="modal">
+        <div class="modal-content glass-panel movie-modal-layout" style="max-width: 900px;">
+            <button class="close-btn" id="close-movie-modal">✕</button>
+            
+            <div class="movie-modal-top">
+                <div class="movie-modal-poster" id="modal-poster"></div>
+                <div class="movie-modal-info">
+                    <h2 id="modal-title" style="font-size: 2rem; margin-bottom: 0.5rem;">Movie Title</h2>
+                    <p id="modal-meta" style="color: var(--text-muted); margin-bottom: 1rem;">Year • Genre • Runtime</p>
+                    <p id="modal-plot" style="line-height: 1.6; margin-bottom: 2rem;">Loading plot description...</p>
+                    
+                    <div class="list-actions">
+                        <button class="btn btn-outline" id="btn-fav">❤️ Favorite</button>
+                        <button class="btn btn-outline" id="btn-watched">✅ Watched</button>
+                        <button class="btn btn-outline" id="btn-watchlist">📋 Watchlist</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="movie-modal-bottom">
+                <h3 style="margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">Live Movie Chat</h3>
+                <p style="color:var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem;">Chatting in real-time with anyone else currently viewing this movie.</p>
+                
+                <div class="chat-container" style="height: 300px; max-width: 100%; border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 1rem;">
+                    <div class="chat-messages" id="movie-chat-messages" style="background: rgba(0,0,0,0.2);">
+                        <p style="color:var(--text-muted); text-align:center;">Loading movie chat...</p>
+                    </div>
+                    
+                    <div class="chat-input-area" style="border-top: 1px solid var(--border-color); background: var(--card-bg);">
+                        <!-- Removed star rating, now just chat -->
+                        <input type="text" id="movie-chat-input" placeholder="Discuss this movie..." autocomplete="off">
+                        <button id="send-movie-chat-btn" class="btn btn-primary">Send</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Modal (Shown on Load) -->
+    <div id="login-modal" class="modal active">
+        <div class="modal-content glass-panel" style="text-align: center; max-width: 450px;">
+            <h2 style="margin-bottom: 1rem;">Welcome to CineClub</h2>
+            <p style="color: var(--text-muted); margin-bottom: 2rem;">You must sign in with your Google Account to access the app.</p>
+            <button id="google-login-btn" class="btn btn-primary" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.5rem; background: white; color: #333;">
+                <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"></path><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z"></path><path fill="#FBBC05" d="M3.964 10.71C3.784 10.17 3.682 9.593 3.682 9s.102-1.17.282-1.71V4.958H.957C.347 6.175 0 7.55 0 9s.348 2.825.957 4.042l3.007-2.332z"></path><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"></path></svg>
+                <strong>Sign in with Google</strong>
+            </button>
+        </div>
+    </div>
+
+    <!-- Firebase Compat SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+    <!-- App Logic -->
+    <script src="app.js"></script>
+</body>
+</html>
